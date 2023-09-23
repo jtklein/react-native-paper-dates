@@ -22,6 +22,7 @@ import Color from 'color'
 function TimeInputs({
   hours,
   minutes,
+  seconds,
   onFocusInput,
   focused,
   inputType,
@@ -33,22 +34,31 @@ function TimeInputs({
   focused: PossibleClockTypes
   hours: number
   minutes: number
+  seconds: number
   onFocusInput: (type: PossibleClockTypes) => any
   onChange: (hoursMinutesAndFocused: {
     hours: number
     minutes: number
+    seconds: number
     focused?: undefined | PossibleClockTypes
   }) => any
   is24Hour: boolean
   inputFontSize?: number
 }) {
   const startInput = React.useRef<TextInputNative | null>(null)
+  const middleInput = React.useRef<TextInputNative | null>(null)
   const endInput = React.useRef<TextInputNative | null>(null)
   const dimensions = useWindowDimensions()
   const isLandscape = dimensions.width > dimensions.height
   const theme = useTheme()
 
   const onSubmitStartInput = React.useCallback(() => {
+    if (middleInput.current) {
+      middleInput.current.focus()
+    }
+  }, [middleInput])
+
+  const onSubmitMiddleInput = React.useCallback(() => {
     if (endInput.current) {
       endInput.current.focus()
     }
@@ -59,16 +69,54 @@ function TimeInputs({
   }, [])
 
   const minutesRef = useLatest(minutes)
+  const secondsRef = useLatest(seconds)
   const onChangeHours = React.useCallback(
     (newHours: number) => {
       onChange({
         hours: newHours,
         minutes: minutesRef.current,
+        seconds: secondsRef.current,
         focused: clockTypes.hours,
       })
     },
-    [onChange, minutesRef]
+    [onChange, minutesRef, secondsRef]
   )
+
+  const renderSeparator = () => {
+    return (
+      <View
+        style={[
+          styles.hoursAndMinutesSeparator,
+          // eslint-disable-next-line react-native/no-inline-styles
+          { marginBottom: inputType === 'keyboard' ? 24 : 0 },
+        ]}
+      >
+        <View style={styles.spaceDot} />
+        <View
+          style={[
+            styles.dot,
+            {
+              backgroundColor: theme?.isV3
+                ? theme.colors.onSurface
+                : (theme as any as MD2Theme).colors.text,
+            },
+          ]}
+        />
+        <View style={styles.betweenDot} />
+        <View
+          style={[
+            styles.dot,
+            {
+              backgroundColor: theme?.isV3
+                ? theme.colors.onSurface
+                : (theme as any as MD2Theme).colors.text,
+            },
+          ]}
+        />
+        <View style={styles.spaceDot} />
+      </View>
+    )
+  }
 
   return (
     <View
@@ -108,6 +156,7 @@ function TimeInputs({
             onChange({
               hours: newHours,
               minutes,
+              seconds,
             })
           }}
         />
@@ -117,40 +166,10 @@ function TimeInputs({
           </Text>
         ) : null}
       </View>
-      <View
-        style={[
-          styles.hoursAndMinutesSeparator,
-          // eslint-disable-next-line react-native/no-inline-styles
-          { marginBottom: inputType === 'keyboard' ? 24 : 0 },
-        ]}
-      >
-        <View style={styles.spaceDot} />
-        <View
-          style={[
-            styles.dot,
-            {
-              backgroundColor: theme?.isV3
-                ? theme.colors.onSurface
-                : (theme as any as MD2Theme).colors.text,
-            },
-          ]}
-        />
-        <View style={styles.betweenDot} />
-        <View
-          style={[
-            styles.dot,
-            {
-              backgroundColor: theme?.isV3
-                ? theme.colors.onSurface
-                : (theme as any as MD2Theme).colors.text,
-            },
-          ]}
-        />
-        <View style={styles.spaceDot} />
-      </View>
+      {renderSeparator()}
       <View style={styles.column}>
         <TimeInput
-          ref={endInput}
+          ref={middleInput}
           inputFontSize={inputFontSize}
           placeholder={'00'}
           value={minutes}
@@ -164,7 +183,7 @@ function TimeInputs({
               ? Color(theme.colors.primary).darken(0.2).hex()
               : theme.colors.primary
           }
-          onSubmitEditing={onSubmitEndInput}
+          onSubmitEditing={onSubmitMiddleInput}
           onChanged={(newMinutesFromInput) => {
             let newMinutes = newMinutesFromInput
             if (newMinutesFromInput > 59) {
@@ -173,12 +192,49 @@ function TimeInputs({
             onChange({
               hours,
               minutes: newMinutes,
+              seconds,
             })
           }}
         />
         {inputType === 'keyboard' ? (
           <Text maxFontSizeMultiplier={1.5} variant="bodySmall">
             Minute
+          </Text>
+        ) : null}
+      </View>
+      {renderSeparator()}
+      <View style={styles.column}>
+        <TimeInput
+          ref={endInput}
+          inputFontSize={inputFontSize}
+          placeholder={'00'}
+          value={seconds}
+          clockType={clockTypes.seconds}
+          pressed={focused === clockTypes.seconds}
+          onPress={onFocusInput}
+          inputType={inputType}
+          maxFontSizeMultiplier={1.2}
+          selectionColor={
+            theme.dark
+              ? Color(theme.colors.primary).darken(0.2).hex()
+              : theme.colors.primary
+          }
+          onSubmitEditing={onSubmitEndInput}
+          onChanged={(newSecondsFromInput) => {
+            let newSeconds = newSecondsFromInput
+            if (newSecondsFromInput > 59) {
+              newSeconds = 59
+            }
+            onChange({
+              hours,
+              minutes,
+              seconds: newSeconds,
+            })
+          }}
+        />
+        {inputType === 'keyboard' ? (
+          <Text maxFontSizeMultiplier={1.5} variant="bodySmall">
+            Second
           </Text>
         ) : null}
       </View>

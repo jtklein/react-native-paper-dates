@@ -17,16 +17,19 @@ import { DisplayModeContext } from '../contexts/DisplayModeContext'
 type onChangeFunc = ({
   hours,
   minutes,
+  seconds,
   focused,
 }: {
   hours: number
   minutes: number
+  seconds: number
   focused?: undefined | PossibleClockTypes
 }) => any
 
 function TimePicker({
   hours,
   minutes,
+  seconds,
   onFocusInput,
   focused,
   inputType,
@@ -40,6 +43,7 @@ function TimePicker({
   focused: PossibleClockTypes
   hours: number
   minutes: number
+  seconds: number
   onFocusInput: (type: PossibleClockTypes) => any
   onChange: onChangeFunc
   use24HourClock?: boolean
@@ -110,6 +114,7 @@ function TimePicker({
           inputFontSize={inputFontSize}
           hours={hours}
           minutes={minutes}
+          seconds={seconds}
           is24Hour={is24Hour}
           onChange={onChange}
           onFocusInput={onFocusInput}
@@ -120,6 +125,7 @@ function TimePicker({
             <AnalogClock
               hours={toHourInputFormat(hours, is24Hour)}
               minutes={minutes}
+              seconds={seconds}
               focused={focused}
               is24Hour={is24Hour}
               onChange={onInnerChange}

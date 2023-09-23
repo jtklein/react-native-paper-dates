@@ -47,6 +47,7 @@ export function TimePickerModal({
   onConfirm,
   hours,
   minutes,
+  seconds,
   label = 'Select time',
   uppercase = true,
   cancelLabel = 'Cancel',
@@ -66,9 +67,14 @@ export function TimePickerModal({
   confirmLabel?: string
   hours?: number | undefined
   minutes?: number | undefined
+  seconds?: number | undefined
   visible: boolean | undefined
   onDismiss: () => any
-  onConfirm: (hoursAndMinutes: { hours: number; minutes: number }) => any
+  onConfirm: (hoursMinutesSeconds: {
+    hours: number
+    minutes: number
+    seconds: number
+  }) => any
   animationType?: 'slide' | 'fade' | 'none'
   keyboardIcon?: string
   clockIcon?: string
@@ -97,6 +103,9 @@ export function TimePickerModal({
   const [localMinutes, setLocalMinutes] = React.useState<number>(
     getMinutes(minutes)
   )
+  const [localSeconds, setLocalSeconds] = React.useState<number>(
+    getSeconds(seconds)
+  )
 
   if (inputType === inputTypes.keyboard && !label) {
     labelText = 'Enter time'
@@ -110,6 +119,10 @@ export function TimePickerModal({
     setLocalMinutes(getMinutes(minutes))
   }, [setLocalMinutes, minutes])
 
+  React.useEffect(() => {
+    setLocalSeconds(getSeconds(seconds))
+  }, [setLocalSeconds, seconds])
+
   const onFocusInput = React.useCallback(
     (type: PossibleClockTypes) => setFocused(type),
     []
@@ -119,6 +132,7 @@ export function TimePickerModal({
       focused?: PossibleClockTypes | undefined
       hours: number
       minutes: number
+      seconds: number
     }) => {
       if (params.focused) {
         setFocused(params.focused)
@@ -126,8 +140,9 @@ export function TimePickerModal({
 
       setLocalHours(params.hours)
       setLocalMinutes(params.minutes)
+      setLocalSeconds(params.seconds)
     },
-    [setFocused, setLocalHours, setLocalMinutes]
+    [setFocused, setLocalHours, setLocalMinutes, setLocalSeconds]
   )
   return (
     <Modal
@@ -200,6 +215,7 @@ export function TimePickerModal({
                   focused={focused}
                   hours={localHours}
                   minutes={localMinutes}
+                  seconds={localSeconds}
                   onChange={onChange}
                   onFocusInput={onFocusInput}
                 />
@@ -221,7 +237,11 @@ export function TimePickerModal({
                 </Button>
                 <Button
                   onPress={() =>
-                    onConfirm({ hours: localHours, minutes: localMinutes })
+                    onConfirm({
+                      hours: localHours,
+                      minutes: localMinutes,
+                      seconds: localSeconds,
+                    })
                   }
                   uppercase={uppercase}
                 >
@@ -236,13 +256,18 @@ export function TimePickerModal({
   )
 }
 
+function getHours(hours: number | undefined | null): number {
+  return hours === undefined || hours === null ? new Date().getHours() : hours
+}
 function getMinutes(minutes: number | undefined | null): number {
   return minutes === undefined || minutes === null
     ? new Date().getMinutes()
     : minutes
 }
-function getHours(hours: number | undefined | null): number {
-  return hours === undefined || hours === null ? new Date().getHours() : hours
+function getSeconds(seconds: number | undefined | null): number {
+  return seconds === undefined || seconds === null
+    ? new Date().getSeconds()
+    : seconds
 }
 
 const styles = StyleSheet.create({

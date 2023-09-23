@@ -54,13 +54,14 @@ export const getTimeInputTypeIcon = (
   )
 }
 
-export type PossibleClockTypes = 'hours' | 'minutes'
+export type PossibleClockTypes = 'hours' | 'minutes' | 'seconds'
 export type ClockTypeMap = {
   [clockType in PossibleClockTypes]: PossibleClockTypes
 }
 export const clockTypes: ClockTypeMap = {
-  minutes: 'minutes',
   hours: 'hours',
+  minutes: 'minutes',
+  seconds: 'seconds',
 }
 
 // Code inspiration and copied from: https://github.com/ShaneGH/analogue-time-picker/blob/master/src/utils/angle.ts

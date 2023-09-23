@@ -23,20 +23,24 @@ import AnalogClockHours from './AnalogClockHours'
 import AnimatedClockSwitcher from './AnimatedClockSwitcher'
 import AnalogClockMinutes from './AnalogClockMinutes'
 import { DisplayModeContext } from '../contexts/DisplayModeContext'
+
 function AnalogClock({
   hours,
   minutes,
+  seconds,
   focused,
   is24Hour,
   onChange,
 }: {
   hours: number
   minutes: number
+  seconds: number
   focused: PossibleClockTypes
   is24Hour: boolean
-  onChange: (hoursMinutesAndFocused: {
+  onChange: (hoursMinutesSecondsAndFocused: {
     hours: number
     minutes: number
+    seconds: number
     focused?: undefined | PossibleClockTypes
   }) => any
 }) {
@@ -50,6 +54,7 @@ function AnalogClock({
   const hoursRef = useLatest(hours)
   const onChangeRef = useLatest(onChange)
   const minutesRef = useLatest(minutes)
+  const secondsRef = useLatest(seconds)
   const focusedRef = useLatest(focused)
   const is24HourRef = useLatest(is24Hour)
   const modeRef = useLatest(mode)
@@ -90,20 +95,40 @@ function AnalogClock({
           onChangeRef.current({
             hours: pickedHours,
             minutes: minutesRef.current,
+            seconds: secondsRef.current,
             focused: final ? clockTypes.minutes : undefined,
           })
         }
       } else if (focusedRef.current === clockTypes.minutes) {
         let pickedMinutes = getMinutes(angle)
-        if (minutesRef.current !== pickedMinutes) {
+        if (minutesRef.current !== pickedMinutes || final) {
           onChangeRef.current({
             hours: hoursRef.current,
             minutes: pickedMinutes,
+            seconds: secondsRef.current,
+            focused: final ? clockTypes.seconds : undefined,
+          })
+        }
+      } else if (focusedRef.current === clockTypes.seconds) {
+        let pickedSeconds = getMinutes(angle)
+        if (secondsRef.current !== pickedSeconds) {
+          onChangeRef.current({
+            hours: hoursRef.current,
+            minutes: minutesRef.current,
+            seconds: pickedSeconds,
           })
         }
       }
     },
-    [focusedRef, is24HourRef, hoursRef, onChangeRef, minutesRef, modeRef]
+    [
+      focusedRef,
+      is24HourRef,
+      hoursRef,
+      onChangeRef,
+      minutesRef,
+      secondsRef,
+      modeRef,
+    ]
   )
   const panResponder = React.useRef(
     PanResponder.create({
@@ -119,7 +144,15 @@ function AnalogClock({
     })
   ).current
   const dynamicSize = focused === clockTypes.hours && shortPointer ? 33 : 0
-  const pointerNumber = focused === clockTypes.hours ? hours : minutes
+  const pointerNumber = () => {
+    if (focused === clockTypes.hours) {
+      return hours
+    } else if (focused === clockTypes.minutes) {
+      return minutes
+    } else {
+      return seconds
+    }
+  }
   const degreesPerNumber = focused === clockTypes.hours ? 30 : 6
   return (
     <View
@@ -144,16 +177,19 @@ function AnalogClock({
           {
             backgroundColor: theme.colors.primary,
             transform: [
-              { rotate: -90 + pointerNumber * degreesPerNumber + 'deg' },
+              { rotate: -90 + pointerNumber() * degreesPerNumber + 'deg' },
               {
                 translateX:
                   circleSize / 4 -
                   (focused === clockTypes.hours &&
-                  pointerNumber >= 0 &&
-                  pointerNumber < 13
+                  pointerNumber() >= 0 &&
+                  pointerNumber() < 13
                     ? 0
                     : 4) +
-                  (focused === clockTypes.minutes ? 4 : 0) -
+                  (focused === clockTypes.minutes ||
+                  focused === clockTypes.seconds
+                    ? 4
+                    : 0) -
                   dynamicSize / 2,
               },
             ],
@@ -183,6 +219,7 @@ function AnalogClock({
         focused={focused}
         hours={<AnalogClockHours is24Hour={is24Hour} hours={hours} />}
         minutes={<AnalogClockMinutes minutes={minutes} />}
+        seconds={<AnalogClockMinutes minutes={seconds} />}
       />
     </View>
   )
