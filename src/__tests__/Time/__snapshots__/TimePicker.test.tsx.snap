@@ -345,7 +345,7 @@ exports[`renders TimePicker 1`] = `
               },
             ]
           }
-          value="undefined"
+          value="42"
         />
       </View>
       <Text

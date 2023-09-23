@@ -12,6 +12,7 @@ it('renders TimePicker', () => {
         focused="hours"
         hours={6}
         minutes={30}
+        seconds={42}
         onChange={() => null}
         onFocusInput={() => null}
       />
