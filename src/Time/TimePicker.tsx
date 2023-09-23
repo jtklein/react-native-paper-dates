@@ -98,8 +98,8 @@ function TimePicker({
                 styles.rootLandscape,
                 {
                   width:
-                    24 * 3 +
-                    96 * 2 +
+                    24 * 4 +
+                    96 * 3 +
                     52 +
                     (inputType === inputTypes.picker
                       ? circleSize
