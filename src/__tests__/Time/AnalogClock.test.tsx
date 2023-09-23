@@ -10,7 +10,6 @@ it('renders AnalogClock', () => {
       <AnalogClock
         hours={12}
         minutes={30}
-        seconds={45}
         focused="hours"
         is24Hour={false}
         onChange={() => null}

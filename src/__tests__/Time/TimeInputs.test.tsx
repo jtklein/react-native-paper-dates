@@ -10,7 +10,6 @@ it('renders TimeInputs', () => {
         inputType="keyboard"
         hours={12}
         minutes={45}
-        seconds={30}
         is24Hour
         onChange={() => null}
         onFocusInput={() => null}
