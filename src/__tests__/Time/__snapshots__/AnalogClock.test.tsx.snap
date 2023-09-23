@@ -2143,7 +2143,9 @@ exports[`renders AnalogClock 1`] = `
                     "letterSpacing": 0.15,
                     "lineHeight": 24,
                   },
-                  undefined,
+                  {
+                    "color": "rgba(255, 255, 255, 1)",
+                  },
                 ],
               ]
             }

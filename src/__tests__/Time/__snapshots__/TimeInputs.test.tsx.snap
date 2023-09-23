@@ -337,7 +337,7 @@ exports[`renders TimeInputs 1`] = `
             },
           ]
         }
-        value="undefined"
+        value="30"
       />
     </View>
     <Text
