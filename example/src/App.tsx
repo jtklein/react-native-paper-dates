@@ -97,7 +97,8 @@ function App() {
   const [time, setTime] = useState<{
     hours: number | undefined
     minutes: number | undefined
-  }>({ hours: undefined, minutes: undefined })
+    seconds: number | undefined
+  }>({ hours: undefined, minutes: undefined, seconds: undefined })
   const [locale, setLocale] = useState('en-GB')
   const [timeOpen, setTimeOpen] = useState(false)
   const [rangeOpen, setRangeOpen] = useState(false)
@@ -120,6 +121,7 @@ function App() {
       new Intl.DateTimeFormat(locale, {
         hour: '2-digit',
         minute: '2-digit',
+        second: '2-digit',
         hour12: false,
       }),
     [locale]
@@ -131,12 +133,13 @@ function App() {
   let timeDate = new Date()
   time.hours !== undefined && timeDate.setHours(time.hours)
   time.minutes !== undefined && timeDate.setMinutes(time.minutes)
+  time.seconds !== undefined && timeDate.setSeconds(time.seconds)
 
   /** Callbacks. */
   const onConfirmTime = useCallback(
-    ({ hours, minutes }: any) => {
+    ({ hours, minutes, seconds }: any) => {
       setTimeOpen(false)
-      setTime({ hours, minutes })
+      setTime({ hours, minutes, seconds })
     },
     [setTimeOpen, setTime]
   )
@@ -306,7 +309,8 @@ function App() {
                 >
                   {time &&
                   time.hours !== undefined &&
-                  time.minutes !== undefined
+                  time.minutes !== undefined &&
+                  time.seconds !== undefined
                     ? timeFormatter.format(timeDate)
                     : 'No time selected.'}
                 </Text>
@@ -495,6 +499,7 @@ function App() {
         onConfirm={onConfirmTime}
         hours={time.hours}
         minutes={time.minutes}
+        seconds={time.seconds}
       />
     </>
   )
